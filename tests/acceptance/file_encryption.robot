@@ -54,12 +54,16 @@ Verify Decrypted Content
 
 *** Keywords ***
 Initialize File Test Environment
-    [Documentation]    Set up file test environment
-    Log    Initializing file encryption test environment
-    
+    [Documentation]    Set up an isolated GPG keyring for this suite
+    ${home}=    Evaluate    tempfile.mkdtemp(prefix='rfpgp_file_')    modules=tempfile
+    Set Gpg Home Directory    ${home}
+    Set Suite Variable    ${GPG_HOME}    ${home}
+    Log    Initialized file encryption test environment at ${home}
+
 Cleanup File Test Environment
     [Documentation]    Clean up file test environment
     Run Keyword And Ignore Error    Remove File    ${INPUT_FILE}
     Run Keyword And Ignore Error    Remove File    ${ENCRYPTED_FILE}
     Run Keyword And Ignore Error    Remove File    ${DECRYPTED_FILE}
+    Evaluate    shutil.rmtree($GPG_HOME, ignore_errors=True)    modules=shutil
     Log    Cleaned up file test environment

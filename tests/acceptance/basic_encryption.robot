@@ -25,7 +25,7 @@ List Keys After Generation
     [Documentation]    Verify key appears in key list
     ${keys}    List Keys
     Length Should Be    ${keys}    1
-    Should Contain    ${keys[0]['uids']}    ${TEST_EMAIL}
+    Should Contain    ${keys[0]['uids'][0]}    ${TEST_EMAIL}
 
 Export Public Key
     [Documentation]    Test public key export
@@ -70,13 +70,17 @@ Get Key Information
     [Documentation]    Test retrieving key details
     ${key_info}    Get Key Info    ${TEST_EMAIL}
     Should Be Equal    ${key_info}[fingerprint]    ${KEY_FINGERPRINT}
-    Should Contain    ${key_info}[uids]    ${TEST_EMAIL}
+    Should Contain    ${key_info}[uids][0]    ${TEST_EMAIL}
 
 *** Keywords ***
 Initialize Test Environment
-    [Documentation]    Set up test environment
-    Log    Initializing PGP test environment
-    
+    [Documentation]    Set up an isolated GPG keyring for this suite
+    ${home}=    Evaluate    tempfile.mkdtemp(prefix='rfpgp_basic_')    modules=tempfile
+    Set Gpg Home Directory    ${home}
+    Set Suite Variable    ${GPG_HOME}    ${home}
+    Log    Initialized PGP test environment at ${home}
+
 Cleanup Test Environment
-    [Documentation]    Clean up test environment
+    [Documentation]    Remove the isolated GPG keyring
+    Evaluate    shutil.rmtree($GPG_HOME, ignore_errors=True)    modules=shutil
     Log    Cleaning up PGP test environment
