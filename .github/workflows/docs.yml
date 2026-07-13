@@ -73,24 +73,24 @@ jobs:
         name: keyword-documentation
         path: keyword_docs.html
 
-  readthedocs:
-    # Trigger a Read the Docs build after docs build succeeds on main / tags.
-    needs: docs
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Trigger Read the Docs build
-      env:
-        RTD_TOKEN: ${{ secrets.RTD_TOKEN }}
-        RTD_PROJECT: robotframework-pgp
-      run: |
-        # Build the tag version on a tag push, otherwise 'latest' (tracks main).
-        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-          VERSION="${GITHUB_REF#refs/tags/}"
-        else
-          VERSION="latest"
-        fi
-        echo "Triggering RTD build: project=${RTD_PROJECT} version=${VERSION}"
-        curl -sSf -X POST \
-          -H "Authorization: Token ${RTD_TOKEN}" \
-          "https://readthedocs.org/api/v3/projects/${RTD_PROJECT}/versions/${VERSION}/builds/"
+  # readthedocs:
+  #   # Trigger a Read the Docs build after docs build succeeds on main / tags.
+  #   needs: docs
+  #   if: github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Trigger Read the Docs build
+  #     env:
+  #       RTD_TOKEN: ${{ secrets.RTD_TOKEN }}
+  #       RTD_PROJECT: robotframework-pgp
+  #     run: |
+  #       # Build the tag version on a tag push, otherwise 'latest' (tracks main).
+  #       if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+  #         VERSION="${GITHUB_REF#refs/tags/}"
+  #       else
+  #         VERSION="latest"
+  #       fi
+  #       echo "Triggering RTD build: project=${RTD_PROJECT} version=${VERSION}"
+  #       curl -sSf -X POST \
+  #         -H "Authorization: Token ${RTD_TOKEN}" \
+  #         "https://readthedocs.org/api/v3/projects/${RTD_PROJECT}/versions/${VERSION}/builds/"
