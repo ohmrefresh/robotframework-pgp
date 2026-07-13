@@ -169,8 +169,10 @@ Deletes a GPG key.
 
 .. code-block:: robotframework
 
-   Delete Key    alice@example.com
+   # Delete the secret half first (needs the passphrase on GnuPG >= 2.1),
+   # then the public half
    Delete Key    alice@example.com    secret=${True}    passphrase=secret123
+   Delete Key    alice@example.com
 
 Encryption/Decryption Keywords
 ------------------------------

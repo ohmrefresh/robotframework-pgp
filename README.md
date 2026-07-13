@@ -4,11 +4,16 @@ A Robot Framework library for PGP/GPG encryption and decryption operations.
 
 ## Features
 
-- PGP/GPG encryption and decryption
-- Key generation and management
-- Digital signatures
-- Support for both symmetric and asymmetric encryption
-- Easy integration with Robot Framework test suites
+- Text and file encryption/decryption (asymmetric and symmetric)
+- Key generation, import/export (public and private), inspection, and deletion
+- Digital signatures with cleartext signing and verification
+- Isolated GPG home directory support for hermetic test runs
+- 17 keywords, easy integration with Robot Framework test suites
+
+## Requirements
+
+- Python 3.8+
+- A `gpg` binary on the PATH (GnuPG 2.x) — there is no pure-Python fallback
 
 ## Installation
 
@@ -24,10 +29,14 @@ Library    RobotFrameworkPGP
 
 *** Test Cases ***
 Encrypt And Decrypt Text
+    Generate Key Pair    recipient@example.com    Test User    2048    mypassword
     ${encrypted}    Encrypt Text    Hello World    recipient@example.com
     ${decrypted}    Decrypt Text    ${encrypted}    passphrase=mypassword
     Should Be Equal    ${decrypted}    Hello World
 ```
+
+Runnable example suites live in [`examples/`](examples/): basic usage,
+file operations, and key management.
 
 ## Documentation
 

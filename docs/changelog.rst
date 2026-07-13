@@ -9,6 +9,23 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 [Unreleased]
 ------------
 
+[1.1.0] - 2026-07-13
+---------------------
+
+Added
+~~~~~
+- Maintainer/author email and ``Framework :: Robot Framework`` classifier in package metadata
+- CI workflow testing across multiple Robot Framework versions
+- Key management and utility keyword examples (``examples/key_management.robot``)
+
+Changed
+~~~~~~~
+- Release workflow now uses PyPI trusted publishing and triggers Read the Docs builds
+
+Removed
+~~~~~~~
+- Unused ``cryptography`` dependency
+
 [1.0.0] - 2024-01-01
 ---------------------
 

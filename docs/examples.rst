@@ -140,8 +140,8 @@ Combining signatures with encryption:
    *** Test Cases ***
    Sign And Encrypt Example
        # Generate keys
-       Generate Key Pair    sender@example.com     Sender    2048    sender_pass
-       Generate Key Pair    recipient@example.com  Recipient 2048    recipient_pass
+       Generate Key Pair    sender@example.com       Sender       2048    sender_pass
+       Generate Key Pair    recipient@example.com    Recipient    2048    recipient_pass
        
        # Sign and encrypt in one operation
        ${message}    Set Variable    Authenticated and encrypted message
@@ -207,14 +207,56 @@ Managing GPG keys:
        ${public_key}    Export Public Key    test1@example.com
        Should Contain    ${public_key}    BEGIN PGP PUBLIC KEY BLOCK
        
-       # Delete and re-import key
-       Delete Key    test1@example.com
+       # Delete and re-import key: remove the secret half first
+       # (needs the passphrase on GnuPG >= 2.1), then the public half
+       Delete Key    ${fp1}    secret=${True}    passphrase=pass1
+       Delete Key    ${fp1}
        ${keys_after_delete}    List Keys
        Length Should Be    ${keys_after_delete}    1
        
        Import Key    ${public_key}
        ${keys_after_import}    List Keys
        Length Should Be    ${keys_after_import}    2
+
+Private Key Backup and Restore
+------------------------------
+
+Round-tripping a private key through export and re-import
+(see ``examples/key_management.robot`` for the runnable version):
+
+.. warning::
+
+   Exported private keys are secrets — never log them or commit them to
+   version control. Only write them to throwaway directories that are
+   removed afterwards.
+
+.. code-block:: robotframework
+
+   *** Settings ***
+   Library    RobotFrameworkPGP
+   Library    OperatingSystem
+
+   *** Test Cases ***
+   Export And Import Private Key
+       Generate Key Pair    backup@example.com    Backup User    2048    backup_secret
+
+       # Export both halves of the key pair
+       ${public_key}    Export Public Key    backup@example.com
+       ${private_key}    Export Private Key    backup@example.com    backup_secret
+       Should Contain    ${private_key}    BEGIN PGP PRIVATE KEY BLOCK
+
+       # Save the private key to a file (temp dir only!)
+       Create File    ${TEMPDIR}${/}backup_private.asc    ${private_key}
+
+       # Delete the key, then restore it from the exported file
+       Delete Key    backup@example.com    secret=${True}    passphrase=backup_secret
+       ${fingerprints}    Import Key From File    ${TEMPDIR}${/}backup_private.asc
+       Should Not Be Empty    ${fingerprints}
+
+       # The restored key can decrypt again
+       ${encrypted}    Encrypt Text    Restored and working    backup@example.com
+       ${decrypted}    Decrypt Text    ${encrypted}    passphrase=backup_secret
+       Should Be Equal    ${decrypted}    Restored and working
 
 Batch Operations
 ----------------

@@ -2,9 +2,10 @@
 Documentation    File encryption and decryption examples
 Library          RobotFrameworkPGP
 Library          OperatingSystem
+Suite Teardown   Cleanup Example Files
 
 *** Variables ***
-${TEMP_DIR}    ${TEMPDIR}${/}pgp_examples
+${WORK_DIR}    ${TEMPDIR}${/}pgp_examples
 
 *** Test Cases ***
 File Encryption Example
@@ -12,15 +13,15 @@ File Encryption Example
     [Tags]    example    file
     
     # Setup
-    Create Directory    ${TEMP_DIR}
+    Create Directory    ${WORK_DIR}
     
     # Generate key pair
     Generate Key Pair    fileuser@example.com    File User    2048    file_secret
     
     # Create a test file
-    ${original_file}    Set Variable    ${TEMP_DIR}${/}document.txt
-    ${encrypted_file}    Set Variable    ${TEMP_DIR}${/}document.txt.gpg
-    ${decrypted_file}    Set Variable    ${TEMP_DIR}${/}document_decrypted.txt
+    ${original_file}    Set Variable    ${WORK_DIR}${/}document.txt
+    ${encrypted_file}    Set Variable    ${WORK_DIR}${/}document.txt.gpg
+    ${decrypted_file}    Set Variable    ${WORK_DIR}${/}document_decrypted.txt
     
     ${file_content}    Set Variable    This is a confidential document.\nIt contains sensitive information.\nPlease keep it secure.
     Create File    ${original_file}    ${file_content}
@@ -56,11 +57,11 @@ Batch File Encryption Example
     
     # Create multiple test files
     FOR    ${i}    IN RANGE    1    4
-        ${file_path}    Set Variable    ${TEMP_DIR}${/}file${i}.txt
+        ${file_path}    Set Variable    ${WORK_DIR}${/}file${i}.txt
         ${content}    Set Variable    Content of file number ${i}
         Create File    ${file_path}    ${content}
         
-        ${encrypted_path}    Set Variable    ${TEMP_DIR}${/}file${i}.txt.gpg
+        ${encrypted_path}    Set Variable    ${WORK_DIR}${/}file${i}.txt.gpg
         Encrypt File
         ...    input_file=${file_path}
         ...    output_file=${encrypted_path}
@@ -76,20 +77,22 @@ Key Management Example
     [Documentation]    Demonstrates key import/export operations
     [Tags]    example    keys
     
-    # Generate a key pair
-    Generate Key Pair    keyuser@example.com    Key User    2048    key_secret
+    # Generate a key pair (keep the fingerprint for deletion later)
+    ${fingerprint}    Generate Key Pair    keyuser@example.com    Key User    2048    key_secret
     
     # Export public key to file
     ${public_key}    Export Public Key    keyuser@example.com
-    ${public_key_file}    Set Variable    ${TEMP_DIR}${/}public_key.asc
+    ${public_key_file}    Set Variable    ${WORK_DIR}${/}public_key.asc
     Create File    ${public_key_file}    ${public_key}
     
     # List current keys
     ${keys_before}    List Keys
     ${count_before}    Get Length    ${keys_before}
     
-    # Delete the key
-    Delete Key    keyuser@example.com
+    # Delete the key: secret half first (needs the passphrase on GnuPG >= 2.1),
+    # then the public half
+    Delete Key    ${fingerprint}    secret=${True}    passphrase=key_secret
+    Delete Key    ${fingerprint}
     
     # Verify key is deleted
     ${keys_after_delete}    List Keys
@@ -107,6 +110,6 @@ Key Management Example
     Log    Key export/import cycle completed successfully
 
 *** Keywords ***
-Suite Teardown
+Cleanup Example Files
     [Documentation]    Clean up example files
-    Run Keyword And Ignore Error    Remove Directory    ${TEMP_DIR}    recursive=True
+    Run Keyword And Ignore Error    Remove Directory    ${WORK_DIR}    recursive=True

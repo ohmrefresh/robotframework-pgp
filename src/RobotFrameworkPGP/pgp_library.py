@@ -50,7 +50,7 @@ class RobotFrameworkPGP:
     """
 
     ROBOT_LIBRARY_SCOPE = "GLOBAL"
-    ROBOT_LIBRARY_VERSION = "1.0.0"
+    ROBOT_LIBRARY_VERSION = "1.1.0"
     ROBOT_LIBRARY_DOC_FORMAT = "ROBOT"
 
     def __init__(self, gnupg_home: Optional[str] = None):
