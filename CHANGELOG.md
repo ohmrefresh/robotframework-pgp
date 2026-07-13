@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-13
+
+### Fixed
+- Example suites: `${TEMP_DIR}` variable collided with Robot Framework's built-in `${TEMPDIR}` (recursive definition), broken `Suite Teardown` wiring, and `Delete Key` usage on GnuPG >= 2.1
+- Stale `ROBOT_LIBRARY_VERSION` reported by the library
+- Broken `Delete Key` snippets in documentation
+
+### Added
+- `examples/key_management.robot` with isolated GPG home, key inspection, and private key backup/restore examples
+- Private key backup/restore and `Import Key From File` documentation
+
 ## [1.1.0] - 2026-07-13
 
 ### Added

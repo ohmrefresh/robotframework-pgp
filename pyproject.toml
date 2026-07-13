@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "robotframework-pgp"
-version = "1.1.0"
+version = "1.1.1"
 description = "Robot Framework library for PGP/GPG encryption and decryption operations"
 readme = "README.md"
 license = {file = "LICENSE"}
