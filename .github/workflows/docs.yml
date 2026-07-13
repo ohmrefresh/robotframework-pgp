@@ -35,7 +35,7 @@ jobs:
         find docs/_build/html -name "*.html" -exec grep -l "404" {} \; || true
 
     - name: Upload documentation artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: documentation
         path: docs/_build/html/
@@ -67,7 +67,7 @@ jobs:
         python -m robot.libdoc RobotFrameworkPGP keyword_docs.html
 
     - name: Upload keyword documentation
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: keyword-documentation
         path: keyword_docs.html
