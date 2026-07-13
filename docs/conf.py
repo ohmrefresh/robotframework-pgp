@@ -8,8 +8,8 @@ sys.path.insert(0, os.path.abspath('../src'))
 project = 'RobotFrameworkPGP'
 copyright = '2024, Robot Framework PGP Contributors'
 author = 'Robot Framework PGP Contributors'
-version = '1.0.0'
-release = '1.0.0'
+version = '1.1.0'
+release = '1.1.0'
 
 # General configuration
 extensions = [
