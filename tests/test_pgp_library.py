@@ -232,19 +232,67 @@ class TestRobotFrameworkPGP:
         assert version is not None
         assert len(version) > 0
 
-    #
-    # def test_delete_key(self, pgp_library, test_key_pair):
-    #     """Test key deletion."""
-    #     # Verify key exists
-    #     keys = pgp_library.list_keys()
-    #     assert len(keys) == 1
-    #
-    #     # Delete public key (passphrase required for secret key deletion in GnuPG 2.1+)
-    #     pgp_library.delete_key("test@example.com", passphrase="testpassword")
-    #
-    #     # Verify key is deleted
-    #     keys = pgp_library.list_keys()
-    #     assert len(keys) == 0
+    def test_delete_key_with_secret(self, pgp_library, test_key_pair):
+        """Test deleting a key that has a secret part."""
+        assert len(pgp_library.list_keys()) == 1
+
+        # Passphrase required for secret key deletion in GnuPG 2.1+;
+        # secret keys must be addressed by fingerprint.
+        pgp_library.delete_key(test_key_pair, passphrase="testpassword")
+
+        assert len(pgp_library.list_keys()) == 0
+
+    def test_delete_secret_key_only(self, pgp_library, test_key_pair):
+        """Test deleting only the secret part of a key."""
+        assert len(pgp_library.list_keys(secret=True)) == 1
+
+        pgp_library.delete_key(test_key_pair, secret=True, passphrase="testpassword")
+
+        assert len(pgp_library.list_keys(secret=True)) == 0
+
+    def test_delete_key_public_only(self, pgp_library, test_key_pair, tmp_path):
+        """Test deleting a public key when no secret key is present."""
+        public_key = pgp_library.export_public_key("test@example.com")
+        fresh = RobotFrameworkPGP(gnupg_home=str(tmp_path / "pub_only"))
+        fresh.import_key(public_key)
+        assert len(fresh.list_keys()) == 1
+        assert len(fresh.list_keys(secret=True)) == 0
+
+        fresh.delete_key("test@example.com")
+
+        assert len(fresh.list_keys()) == 0
+
+    def test_import_key_from_file(self, pgp_library, test_key_pair, tmp_path):
+        """Test importing a key from a file into a fresh keyring."""
+        public_key = pgp_library.export_public_key("test@example.com")
+        key_file = tmp_path / "public.asc"
+        key_file.write_text(public_key)
+
+        fresh = RobotFrameworkPGP(gnupg_home=str(tmp_path / "import_target"))
+        fingerprints = fresh.import_key_from_file(str(key_file))
+        assert test_key_pair in fingerprints
+
+    def test_import_key_invalid_data(self, pgp_library):
+        """Test importing garbage key data."""
+        with pytest.raises(RuntimeError, match="Failed to import any keys"):
+            pgp_library.import_key("this is not a pgp key")
+
+    def test_export_public_key_not_found(self, pgp_library):
+        """Test exporting a non-existent public key."""
+        with pytest.raises(RuntimeError, match="Failed to export public key"):
+            pgp_library.export_public_key("nonexistent@example.com")
+
+    def test_export_private_key_not_found(self, pgp_library):
+        """Test exporting a non-existent private key."""
+        with pytest.raises(RuntimeError, match="Failed to export private key"):
+            pgp_library.export_private_key(
+                "nonexistent@example.com", passphrase="whatever"
+            )
+
+    def test_sign_text_unknown_key(self, pgp_library):
+        """Test signing with a non-existent key."""
+        with pytest.raises(RuntimeError, match="Text signing failed"):
+            pgp_library.sign_text("hello", key_id="nonexistent@example.com")
 
     def test_encryption_failure_no_recipient(self, pgp_library):
         """Test encryption failure with non-existent recipient."""

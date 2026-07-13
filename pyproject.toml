@@ -81,3 +81,5 @@ python_version = "3.8"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+[tool.coverage.report]
+fail_under = 90

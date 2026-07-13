@@ -180,8 +180,10 @@ class KeyManagementMixin(_Base):
             # Delete secret key only
             result = self._gpg.delete_keys(key_id, secret=True, passphrase=passphrase)
         elif has_secret_key:
-            # Delete secret key first (this should also remove the public key)
+            # The secret key must be deleted before the public key; gpg does
+            # not remove the public key when deleting the secret one.
             result = self._gpg.delete_keys(key_id, secret=True, passphrase=passphrase)
+            result = self._gpg.delete_keys(key_id, secret=False)
         else:
             # Just delete public key
             result = self._gpg.delete_keys(key_id, secret=False)
