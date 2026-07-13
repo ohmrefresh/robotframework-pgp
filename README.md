@@ -38,7 +38,7 @@ Full documentation is available at [Read the Docs](https://robotframework-pgp.re
 ### Setup Development Environment
 
 ```bash
-git clone https://github.com/robotframework/robotframework-pgp.git
+git clone https://github.com/ohmrefresh/robotframework-pgp.git
 cd robotframework-pgp
 pip install -r requirements-dev.txt
 ```

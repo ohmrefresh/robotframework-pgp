@@ -53,7 +53,7 @@ Install from Source
 
 .. code-block:: bash
 
-   git clone https://github.com/robotframework/robotframework-pgp.git
+   git clone https://github.com/ohmrefresh/robotframework-pgp.git
    cd robotframework-pgp
    pip install -e .
 
@@ -64,7 +64,7 @@ For development, install with development dependencies:
 
 .. code-block:: bash
 
-   git clone https://github.com/robotframework/robotframework-pgp.git
+   git clone https://github.com/ohmrefresh/robotframework-pgp.git
    cd robotframework-pgp
    pip install -r requirements-dev.txt
    pip install -e .
